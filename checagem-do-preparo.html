@@ -1,0 +1,425 @@
+<title>Checagem do Preparo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: uma coluna estreita tipo "cartão de jogo", faixa verde-petróleo no topo, uma pergunta por tela. Mesma identidade do folder. */
+:root{
+  --bg:#F3FAF8; --surface:#FFFFFF; --ink:#1F3A3D; --muted:#4F6466; --line:#C9E2DD;
+  --brand:#0E6E6E; --on-brand:#FFFFFF; --brand-text:#0B5555; --brand-soft:#E3F4EF;
+  --sun:#F6C94C; --on-sun:#1F3A3D; --coral:#E8664A; --pink:#F59A8B;
+  --ok:#25693F; --ok-soft:#E2F3E8; --warn:#7A5000; --warn-soft:#FFF1C9; --bad:#A8341F; --bad-soft:#FCE4DE;
+  --display:'Baloo 2', 'Trebuchet MS', system-ui, sans-serif;
+  --body:'Nunito', 'Segoe UI', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0E2123; --surface:#15302F; --ink:#E6F2EF; --muted:#A9C2BE; --line:#2C4F4C;
+  --brand:#0D5B5A; --on-brand:#FFFFFF; --brand-text:#86DACF; --brand-soft:#1C3D3B;
+  --ok:#7BD9A2; --ok-soft:#173A27; --warn:#F6C94C; --warn-soft:#3A3115; --bad:#FF9E8A; --bad-soft:#43221B;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E2123; --surface:#15302F; --ink:#E6F2EF; --muted:#A9C2BE; --line:#2C4F4C;
+  --brand:#0D5B5A; --on-brand:#FFFFFF; --brand-text:#86DACF; --brand-soft:#1C3D3B;
+  --ok:#7BD9A2; --ok-soft:#173A27; --warn:#F6C94C; --warn-soft:#3A3115; --bad:#FF9E8A; --bad-soft:#43221B;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45}
+h1,h2,h3,p{margin:0}
+h1,h2{font-family:var(--display);text-wrap:balance;line-height:1.05}
+button{font:inherit;color:inherit}
+button:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--coral);outline-offset:3px}
+
+.topo{background:var(--brand);color:var(--on-brand)}
+.topo-in{max-width:640px;margin:0 auto;padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;justify-content:space-between;gap:12px}
+.marca{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:.01em}
+.selo{border:1.5px solid currentColor;border-radius:99px;padding:2px 11px;font-size:13px;font-weight:700;white-space:nowrap}
+
+main{max-width:640px;margin:0 auto;padding-block:22px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+
+/* Início */
+.hero{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.hero h1{font-size:clamp(36px,9vw,52px);font-weight:800;color:var(--brand-text)}
+.hero p{color:var(--muted);max-width:52ch}
+.ilustra{align-self:center;width:min(380px,100%);height:auto}
+.escolha{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:460px){.escolha{grid-template-columns:1fr}}
+.exame{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;cursor:pointer;transition:border-color .15s, transform .15s}
+.exame:hover{border-color:var(--brand);transform:translateY(-2px)}
+.exame svg{width:78px;height:78px}
+.exame strong{font-family:var(--display);font-size:24px;line-height:1;color:var(--brand-text)}
+.exame span{font-size:15px;color:var(--muted)}
+.aviso{font-size:14px;color:var(--muted);border-top:1.5px dashed var(--line);padding-top:12px}
+
+/* Pergunta */
+.progresso{display:flex;flex-direction:column;gap:7px}
+.progresso-txt{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.progresso-txt span:first-child{display:flex;align-items:center;gap:6px}
+.progresso-txt svg{width:34px;height:34px}
+.trilha{display:grid;gap:5px}
+.trilha i{height:8px;border-radius:99px;background:var(--line)}
+.trilha i.feito{background:var(--brand)}
+.trilha i.agora{background:var(--sun)}
+.pergunta h2{font-size:clamp(26px,6.5vw,34px);font-weight:800;outline:none}
+.pergunta .dica{color:var(--muted);margin-top:6px;font-size:15.5px}
+.opcoes{display:flex;flex-direction:column;gap:10px}
+.op{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:12px 14px;border-radius:16px;border:2px solid var(--line);background:var(--surface);text-align:left;cursor:pointer;font-weight:700;font-size:16.5px;line-height:1.3;transition:border-color .15s, background .15s}
+.op:hover{border-color:var(--brand)}
+.op .letra{flex:none;width:32px;height:32px;border-radius:99px;display:grid;place-items:center;background:var(--brand-soft);color:var(--brand-text);font-family:var(--display);font-weight:800;font-size:17px}
+.op .cor{flex:none;width:38px;height:38px;border-radius:99px;border:2px solid var(--ink)}
+.op .txt{flex:1;min-width:0}
+.op[aria-pressed="true"].ok{border-color:var(--ok);background:var(--ok-soft)}
+.op[aria-pressed="true"].warn{border-color:var(--warn);background:var(--warn-soft)}
+.op[aria-pressed="true"].bad{border-color:var(--bad);background:var(--bad-soft)}
+
+.retorno{border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;outline:none}
+.retorno.ok{background:var(--ok-soft)}
+.retorno.warn{background:var(--warn-soft)}
+.retorno.bad{background:var(--bad-soft)}
+.retorno .ic{flex:none;width:34px;height:34px}
+.retorno strong{display:block;font-family:var(--display);font-size:20px;line-height:1.1;margin-bottom:3px}
+.retorno.ok strong{color:var(--ok)} .retorno.warn strong{color:var(--warn)} .retorno.bad strong{color:var(--bad)}
+.retorno p{font-size:15.5px}
+
+.acoes{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{min-height:50px;padding:10px 22px;border-radius:99px;border:none;cursor:pointer;font-weight:800;font-size:17px}
+.btn-principal{background:var(--sun);color:var(--on-sun)}
+.btn-principal:hover{filter:brightness(.95)}
+.btn-sec{background:transparent;color:var(--brand-text);text-decoration:underline;text-underline-offset:3px;padding-inline:8px}
+
+/* Resultado */
+.veredito{border-radius:24px;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
+.veredito.ok{background:var(--ok-soft)} .veredito.warn{background:var(--warn-soft)} .veredito.bad{background:var(--bad-soft)}
+.veredito svg{width:110px;height:110px}
+.veredito h2{font-size:clamp(28px,7vw,38px);font-weight:800;outline:none}
+.veredito.ok h2{color:var(--ok)} .veredito.warn h2{color:var(--warn)} .veredito.bad h2{color:var(--bad)}
+.veredito p{max-width:44ch}
+.mostrar{display:flex;align-items:center;gap:10px;background:var(--brand);color:var(--on-brand);border-radius:16px;padding:12px 16px;font-weight:700}
+.mostrar svg{flex:none;width:30px;height:30px}
+.resumo{background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:6px 16px;display:flex;flex-direction:column}
+.resumo h3{font-family:var(--display);font-size:20px;padding:10px 0 4px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.resumo h3 span{font-family:var(--body);font-size:14px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.linha{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line);align-items:center}
+.linha b{font-size:14px;color:var(--muted);font-weight:700}
+.linha p{grid-column:1;font-size:15.5px;font-weight:700}
+.chip{grid-row:1 / span 2;grid-column:2;border-radius:99px;padding:3px 10px;font-size:13px;font-weight:800;white-space:nowrap;display:inline-flex;gap:5px;align-items:center}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.warn{background:var(--warn-soft);color:var(--warn)} .chip.bad{background:var(--bad-soft);color:var(--bad)}
+.rodape{font-size:13.5px;color:var(--muted);text-align:center}
+
+.creditos{border-top:1.5px solid var(--line)}
+.creditos-in{max-width:640px;margin:0 auto;padding-block:16px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));font-size:14px;color:var(--muted);text-align:center;line-height:1.45}
+.creditos-in strong{color:var(--ink)}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+.surge{animation:surge .25s ease-out}
+@keyframes surge{from{transform:translateY(6px)}to{transform:none}}
+</style>
+
+<header class="topo"><div class="topo-in"><span class="marca">Missão: exame tranquilo</span><span class="selo">Setor de Imagem · SADT</span></div></header>
+<main id="app" aria-live="polite"></main>
+<footer class="creditos"><div class="creditos-in">Elaborado por <strong>Luiza Mell Azevedo Amorim</strong>, acadêmica de Enfermagem, como projeto de intervenção da Faculdade Herrero.</div></footer>
+
+<script>
+const PESO = { ok: 0, warn: 1, bad: 2 };
+const TITULO = { ok: "Muito bem!", warn: "Atenção!", bad: "Avise a equipe." };
+const CHIP = { ok: "Certo", warn: "Atenção", bad: "Avise" };
+
+const REMEDIOS = (extra) => ({
+  rotulo: "Medicamentos",
+  pergunta: "Você faz uso contínuo de algum medicamento?",
+  dica: "Atenção especial para anticoagulante (para afinar o sangue), insulina e remédio para diabetes" + extra + ".",
+  opcoes: [
+    { t: "Não uso nenhum medicamento.", s: "ok", r: "Ótimo! Pode seguir para a próxima pergunta." },
+    { t: "Uso e segui a orientação do médico para hoje.", s: "ok", r: "Perfeito. Diga à equipe qual medicamento é e quando foi a última dose." },
+    { t: "Uso, mas não recebi orientação para o exame.", s: "warn", r: "Alguns medicamentos podem aumentar o sangramento ou baixar demais o açúcar no sangue durante o jejum. Conte para a equipe antes do exame." },
+    { t: "Não sei dizer.", s: "warn", r: "Sem problema. Mostre a receita ou a caixa do medicamento para a equipe de enfermagem." }
+  ]
+});
+
+const ACOMPANHANTE = {
+  rotulo: "Acompanhante",
+  pergunta: "Você veio com um acompanhante adulto?",
+  dica: "Quem recebe sedação não pode ir embora sozinho(a).",
+  opcoes: [
+    { t: "Sim, está aqui comigo.", s: "ok", r: "Ótimo! Ele(a) vai receber as orientações para depois do exame junto com você." },
+    { t: "Vai chegar antes de eu ser liberado(a).", s: "warn", r: "Tudo bem. Deixe o nome e o telefone dele(a) com a recepção." },
+    { t: "Não, vim sozinho(a).", s: "bad", r: "Depois da sedação, os reflexos ficam lentos por até 24 horas. Você não pode sair sozinho(a), nem de ônibus ou aplicativo. Avise a equipe para combinar uma solução." }
+  ]
+};
+
+const EXAMES = {
+  endo: {
+    nome: "Endoscopia",
+    perguntas: [
+      {
+        rotulo: "Jejum de sólidos",
+        pergunta: "Há quantas horas você está em jejum de alimentos sólidos?",
+        dica: "Conte a partir da última refeição, mesmo que tenha sido só um biscoito.",
+        opcoes: [
+          { t: "8 horas ou mais.", s: "ok", r: "Perfeito! Esse é o jejum mais comum. Confira se bate com o tempo informado no seu agendamento." },
+          { t: "Entre 6 e 8 horas.", s: "warn", r: "Pode ser pouco. A equipe vai conferir se esse tempo é suficiente para o seu exame." },
+          { t: "Menos de 6 horas.", s: "bad", r: "O estômago ainda pode ter comida. Isso atrapalha a câmera e aumenta o risco durante a sedação." },
+          { t: "Não lembro.", s: "warn", r: "Tente lembrar o horário da última refeição e conte para a equipe." }
+        ]
+      },
+      {
+        rotulo: "Líquidos e doces",
+        pergunta: "Durante o jejum, você bebeu algum líquido ou comeu doces?",
+        dica: "Vale tudo: café, suco, bala, chiclete e doces.",
+        opcoes: [
+          { t: "Não, nada.", s: "ok", r: "Isso mesmo! Jejum é jejum." },
+          { t: "Só um gole de água para tomar remédio.", s: "warn", r: "Costuma ser permitido, mas conte para a equipe o horário do gole." },
+          { t: "Bebi café, suco, leite ou refrigerante.", s: "bad", r: "Essas bebidas quebram o jejum e podem ficar no estômago durante o exame." },
+          { t: "Chupei bala ou masquei chiclete.", s: "warn", r: "Bala e chiclete fazem o estômago produzir mais líquido. Conte para a equipe." },
+          { t: "Comi algum doce, como chocolate, bolo ou brigadeiro.", s: "bad", r: "Doce também é alimento e quebra o jejum. O estômago pode não estar vazio." }
+        ]
+      },
+      REMEDIOS(""),
+      ACOMPANHANTE,
+      {
+        rotulo: "Documentos",
+        pergunta: "Você trouxe o pedido médico e documento com foto?",
+        dica: "Exames anteriores também ajudam o médico.",
+        opcoes: [
+          { t: "Sim, trouxe tudo.", s: "ok", r: "Missão quase completa! Deixe tudo à mão na recepção." },
+          { t: "Trouxe só uma parte.", s: "warn", r: "Fale com a recepção. Em muitos casos dá para resolver na hora." },
+          { t: "Esqueci.", s: "warn", r: "Avise a recepção logo, para ver se o exame pode seguir." }
+        ]
+      }
+    ]
+  },
+  colono: {
+    nome: "Colonoscopia",
+    perguntas: [
+      {
+        rotulo: "Dieta de 3 dias",
+        pergunta: "Nos 3 dias anteriores ao exame, como foi sua alimentação?",
+        dica: "A dieta sem resíduos evita folhas, cascas, sementes, grãos e integrais.",
+        opcoes: [
+          { t: "Segui a dieta sem resíduos.", s: "ok", r: "Excelente! Essa etapa deixa o trabalho do laxante bem mais fácil." },
+          { t: "Segui em parte.", s: "warn", r: "Restos de casca, semente ou grão podem esconder partes do intestino. O termômetro do preparo, mais adiante, vai mostrar se deu certo." },
+          { t: "Comi normalmente.", s: "bad", r: "Sem a dieta, o intestino costuma ficar com resíduos mesmo depois do laxante." }
+        ]
+      },
+      {
+        rotulo: "Véspera",
+        pergunta: "No dia anterior ao exame, o que você comeu e bebeu?",
+        dica: "Líquidos claros são: água, chá, água de coco, gelatina, sucos e caldos coados.",
+        opcoes: [
+          { t: "Só líquidos claros.", s: "ok", r: "Isso aí! Do jeito certo." },
+          { t: "Líquidos claros, mas algum era vermelho ou roxo.", s: "warn", r: "Líquidos vermelhos ou roxos podem ser confundidos com sangue. Conte para a equipe." },
+          { t: "Tomei leite, iogurte ou vitamina.", s: "warn", r: "Leite deixa resíduo no intestino. Conte para a equipe." },
+          { t: "Comi comida sólida.", s: "bad", r: "Comida sólida na véspera costuma deixar resíduos que a câmera não atravessa." }
+        ]
+      },
+      {
+        rotulo: "Laxante",
+        pergunta: "Você tomou o laxante nos períodos corretos?",
+        dica: "O laxante é o medicamento que limpa o intestino.",
+        opcoes: [
+          { t: "Sim, tomei tudo nos horários certos.", s: "ok", r: "Perfeito! Você fez a parte mais difícil." },
+          { t: "Tomei tudo, mas fora dos horários.", s: "warn", r: "O horário influencia a limpeza. Conte para a equipe a que horas tomou." },
+          { t: "Vomitei ou passei mal e não terminei.", s: "warn", r: "Acontece. A equipe vai avaliar se o preparo fez efeito suficiente." },
+          { t: "Tomei só uma parte ou não tomei.", s: "bad", r: "Sem o laxante completo, o intestino dificilmente fica limpo para o exame." }
+        ]
+      },
+      {
+        rotulo: "Hidratação",
+        pergunta: "Você tomou uma grande quantidade de líquidos claros junto ao laxante?",
+        dica: "O líquido ajuda a lavar o intestino e evita desidratação.",
+        opcoes: [
+          { t: "Sim, bebi bastante.", s: "ok", r: "Ótimo! Hidratação é metade do sucesso do preparo." },
+          { t: "Bebi pouco.", s: "warn", r: "Pouco líquido pode deixar o preparo incompleto e causar tontura. Conte para a equipe." }
+        ]
+      },
+      {
+        rotulo: "Termômetro do preparo",
+        pergunta: "Agora, o termômetro do preparo! Qual cor parece mais com a sua última evacuação?",
+        dica: "Pode olhar sem vergonha: essa é a pergunta mais importante.",
+        opcoes: [
+          { t: "Escuro, com pedaços.", cor: "#5A3A1E", s: "bad", r: "O intestino ainda tem fezes. Avise a equipe: ela vai orientar o que fazer." },
+          { t: "Marrom, pastoso ou líquido.", cor: "#9A6A33", s: "bad", r: "Ainda não está limpo. A equipe precisa saber antes do exame." },
+          { t: "Amarelado e turvo, com alguns resíduos.", cor: "#D2AE4C", s: "warn", r: "Está quase! Conte para a equipe; às vezes falta só um pouco." },
+          { t: "Amarelo-claro, como chá, sem pedaços.", cor: "#F7EAB0", s: "ok", r: "Parabéns! Intestino limpinho: a câmera vai enxergar tudo." }
+        ]
+      },
+      REMEDIOS(" e medicamento com ferro"),
+      ACOMPANHANTE
+    ]
+  }
+};
+
+let st = { tela: "inicio", exame: null, i: 0, respostas: [], hora: "" };
+const app = document.getElementById("app");
+
+const ICONE = {
+  ok: '<svg class="ic" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="currentColor"/><path d="M10 17.5l5 5 9-10" fill="none" stroke="var(--surface)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  warn: '<svg class="ic" viewBox="0 0 34 34" aria-hidden="true"><path d="M17 3l15 27H2z" fill="currentColor" stroke-linejoin="round"/><path d="M17 12v9" stroke="var(--surface)" stroke-width="3.5" stroke-linecap="round"/><circle cx="17" cy="25.5" r="2" fill="var(--surface)"/></svg>',
+  bad: '<svg class="ic" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="currentColor"/><path d="M17 9v10" stroke="var(--surface)" stroke-width="3.5" stroke-linecap="round"/><circle cx="17" cy="24.5" r="2.2" fill="var(--surface)"/></svg>'
+};
+
+/* Personagens (desenho próprio, estilo fofo): coordenadas em 200 x 200 */
+const INTESTINO = `
+  <g fill="none" stroke="#9A6A3A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M38 100 Q22 80 18 40"/><path d="M162 100 Q178 80 182 40"/>
+    <path d="M82 160 Q76 178 66 188 L56 186"/><path d="M118 160 Q124 178 134 188 L144 186"/>
+  </g>
+  <ellipse cx="100" cy="106" rx="50" ry="46" fill="#F9C4CC"/>
+  <g fill="none" stroke="#EE9AAA" stroke-width="3" stroke-linecap="round">
+    <path d="M66 82 q8 -8 16 0 t16 0 t16 0 t16 0"/><path d="M62 132 q8 -8 16 0 t16 0 t16 0 t16 0 t12 0"/>
+    <path d="M60 104 q6 -6 10 2"/><path d="M130 104 q6 -6 10 2"/>
+  </g>
+  <path d="M100 150 Q100 170 92 178" fill="none" stroke="#C9475F" stroke-width="22" stroke-linecap="round"/>
+  <path d="M100 150 Q100 170 92 178" fill="none" stroke="#EE7A90" stroke-width="16" stroke-linecap="round"/>
+  <path d="M100 152 L60 150 Q38 148 38 120 L40 70 Q42 42 70 40 L130 40 Q158 42 160 70 L160 120 Q160 148 130 150 L100 152" fill="none" stroke="#C9475F" stroke-width="30" stroke-linejoin="round"/>
+  <path d="M100 152 L60 150 Q38 148 38 120 L40 70 Q42 42 70 40 L130 40 Q158 42 160 70 L160 120 Q160 148 130 150 L100 152" fill="none" stroke="#EE7A90" stroke-width="24" stroke-dasharray="15 4" stroke-linejoin="round"/>
+  <path d="M46 116 L48 74 Q50 52 72 48 L96 47" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-dasharray="7 13" opacity=".8"/>
+  <path d="M84 78 q6 -6 12 0" fill="none" stroke="#5A2E1E" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M106 78 q6 -6 12 0" fill="none" stroke="#5A2E1E" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="89" cy="96" r="12" fill="#FFFFFF"/><circle cx="113" cy="96" r="12" fill="#FFFFFF"/>
+  <circle cx="90" cy="98" r="7" fill="#3A2116"/><circle cx="112" cy="98" r="7" fill="#3A2116"/>
+  <circle cx="92.5" cy="95.5" r="2.4" fill="#FFFFFF"/><circle cx="114.5" cy="95.5" r="2.4" fill="#FFFFFF"/>
+  <path d="M90 114 Q101 136 112 114 Z" fill="#8E2238"/>
+  <path d="M95 126 Q101 120 107 126 Q101 132 95 126 Z" fill="#F2788C"/>`;
+
+const ESTOMAGO = `
+  <g fill="none" stroke="#F08A9B" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M100 166 L98 188 L88 190"/><path d="M130 164 L132 188 L142 190"/>
+    <path d="M62 128 Q50 136 52 154"/><path d="M182 116 Q192 132 186 150"/>
+  </g>
+  <path d="M74 12 Q78 40 86 64" fill="none" stroke="#F7B3BD" stroke-width="26" stroke-linecap="round"/>
+  <ellipse cx="74" cy="12" rx="12" ry="5" fill="#EE8A9C"/>
+  <path d="M74 52 C72 90 122 100 126 74 C130 50 184 50 188 102 C192 152 156 172 116 170 C84 168 66 152 54 142 C44 136 34 142 30 134 C26 124 40 116 52 122 C64 128 78 124 82 108 C86 94 76 76 74 52 Z" fill="#FAC6CE"/>
+  <path d="M188 104 C190 150 156 172 116 170 C96 169 82 163 70 154 C110 164 168 150 176 92 C180 94 186 98 188 104 Z" fill="#F4A5B4" opacity=".75"/>
+  <ellipse cx="30" cy="128" rx="5" ry="8" fill="#EE8A9C"/>
+  <ellipse cx="160" cy="78" rx="11" ry="6.5" transform="rotate(-25 160 78)" fill="#FFFFFF" opacity=".85"/>
+  <circle cx="176" cy="94" r="3" fill="#FFFFFF" opacity=".85"/>
+  <ellipse cx="120" cy="124" rx="4.5" ry="5.5" fill="#1F1A1C"/><ellipse cx="152" cy="122" rx="4.5" ry="5.5" fill="#1F1A1C"/>
+  <path d="M128 134 Q136 141 144 134" fill="none" stroke="#1F1A1C" stroke-width="3.5" stroke-linecap="round"/>
+  <ellipse cx="111" cy="136" rx="7" ry="4" fill="#F27A8E" opacity=".55"/><ellipse cx="161" cy="133" rx="7" ry="4" fill="#F27A8E" opacity=".55"/>`;
+
+function rosto(s){
+  const boca = s === "ok" ? '<path d="M38 66 Q55 82 72 66" fill="none" stroke="#1F3A3D" stroke-width="5" stroke-linecap="round"/>'
+    : s === "warn" ? '<path d="M40 70 L70 70" stroke="#1F3A3D" stroke-width="5" stroke-linecap="round"/>'
+    : '<path d="M38 76 Q55 62 72 76" fill="none" stroke="#1F3A3D" stroke-width="5" stroke-linecap="round"/>';
+  const extra = s === "ok" ? '<path d="M92 18l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#E8664A"/>'
+    : s === "bad" ? '<path d="M24 28 L40 36 M86 28 L70 36" stroke="#1F3A3D" stroke-width="4" stroke-linecap="round"/>' : '';
+  return '<svg viewBox="0 0 110 110" aria-hidden="true"><circle cx="55" cy="55" r="46" fill="#F6C94C" stroke="#1F3A3D" stroke-width="4"/><circle cx="40" cy="47" r="6" fill="#1F3A3D"/><circle cx="70" cy="47" r="6" fill="#1F3A3D"/><circle cx="42" cy="45" r="2" fill="#fff"/><circle cx="72" cy="45" r="2" fill="#fff"/><circle cx="30" cy="62" r="6" fill="#E8664A" opacity=".5"/><circle cx="80" cy="62" r="6" fill="#E8664A" opacity=".5"/>' + boca + extra + '</svg>';
+}
+
+function telaInicio(){
+  return `
+  <section class="hero surge">
+    <svg class="ilustra" viewBox="0 0 400 210" role="img" aria-label="Um intestino e um estômago sorridentes, como personagens">
+      <ellipse cx="200" cy="118" rx="190" ry="88" fill="var(--brand-soft)"/>
+      <g transform="translate(6,6)">${INTESTINO}</g>
+      <g transform="translate(194,8)">${ESTOMAGO}</g>
+      <path d="M200 26l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#E8664A"/>
+      <circle cx="372" cy="36" r="5" fill="#F6C94C"/>
+    </svg>
+    <h1>O seu preparo foi adequado?</h1>
+    <p>Responda rapidamente algumas perguntas e descubra, na hora, se o seu preparo está correto. Leva menos de 2 minutos.</p>
+  </section>
+  <h2 style="font-size:22px">Qual exame você vai fazer hoje?</h2>
+  <div class="escolha">
+    <button class="exame" data-exame="endo">
+      <svg viewBox="0 0 200 200" aria-hidden="true">${ESTOMAGO}</svg>
+      <strong>Endoscopia</strong><span>Exame do esôfago e do estômago.</span>
+    </button>
+    <button class="exame" data-exame="colono">
+      <svg viewBox="0 0 200 200" aria-hidden="true">${INTESTINO}</svg>
+      <strong>Colonoscopia</strong><span>Exame do intestino grosso.</span>
+    </button>
+  </div>
+  <p class="aviso">Responda no dia do exame, enquanto espera ser chamado(a). Esta checagem é educativa e não substitui a avaliação da equipe de enfermagem e do médico.</p>`;
+}
+
+function telaPergunta(){
+  const ex = EXAMES[st.exame], q = ex.perguntas[st.i], n = ex.perguntas.length;
+  const resp = st.respostas[st.i];
+  const trilha = ex.perguntas.map((_, k) => `<i class="${k < st.i ? "feito" : k === st.i ? "agora" : ""}"></i>`).join("");
+  const ops = q.opcoes.map((o, k) => `
+    <button class="op ${o.s}" data-op="${k}" aria-pressed="${resp === k}">
+      ${o.cor ? `<span class="cor" style="background:${o.cor}" aria-hidden="true"></span>` : `<span class="letra" aria-hidden="true">${"ABCDE"[k]}</span>`}
+      <span class="txt">${o.t}</span>
+    </button>`).join("");
+  let ret = "";
+  if (resp !== undefined){
+    const o = q.opcoes[resp];
+    ret = `<div class="retorno ${o.s} surge" id="retorno" tabindex="-1" style="color:var(--${o.s})">${ICONE[o.s]}<div style="color:var(--ink)"><strong>${TITULO[o.s]}</strong><p>${o.r}</p></div></div>`;
+  }
+  const ultima = st.i === n - 1;
+  const mini = st.exame === "endo" ? ESTOMAGO : INTESTINO;
+  return `
+  <div class="progresso">
+    <div class="progresso-txt"><span><svg viewBox="0 0 200 200" aria-hidden="true">${mini}</svg>${ex.nome}</span><span>Pergunta ${st.i + 1} de ${n}</span></div>
+    <div class="trilha" style="grid-template-columns:repeat(${n},minmax(0,1fr))" aria-hidden="true">${trilha}</div>
+  </div>
+  <div class="pergunta">
+    <h2 id="titulo" tabindex="-1">${q.pergunta}</h2>
+    <p class="dica">${q.dica}</p>
+  </div>
+  <div class="opcoes" role="group" aria-labelledby="titulo">${ops}</div>
+  ${ret}
+  <div class="acoes">
+    ${resp !== undefined ? `<button class="btn btn-principal" data-acao="proxima">${ultima ? "Ver meu resultado" : "Próxima pergunta"}</button>` : ""}
+    <button class="btn btn-sec" data-acao="voltar">${st.i === 0 ? "Trocar de exame" : "Voltar"}</button>
+  </div>`;
+}
+
+function telaResultado(){
+  const ex = EXAMES[st.exame];
+  const itens = ex.perguntas.map((q, k) => ({ q, o: q.opcoes[st.respostas[k]] }));
+  const pior = itens.reduce((m, x) => PESO[x.o.s] > PESO[m] ? x.o.s : m, "ok");
+  const nAt = itens.filter(x => x.o.s !== "ok").length;
+  const TXT = {
+    ok: ["Missão cumprida!", "Pelas suas respostas, o preparo parece adequado. A equipe vai confirmar antes do exame. Boa sorte!"],
+    warn: ["Quase lá!", `Seu preparo tem ${nAt} ${nAt === 1 ? "ponto" : "pontos"} de atenção. Converse com a equipe de enfermagem antes do exame: muitas vezes dá para resolver na hora.`],
+    bad: ["Preparo pode estar insuficiente.", "Avise a equipe de enfermagem antes de entrar para o exame. Fique tranquilo(a): ela vai orientar o melhor caminho para você."]
+  };
+  const linhas = itens.map(x => `
+    <div class="linha"><b>${x.q.rotulo}</b><p>${x.o.t}</p><span class="chip ${x.o.s}">${CHIP[x.o.s]}</span></div>`).join("");
+  return `
+  <section class="veredito ${pior} surge">
+    ${rosto(pior)}
+    <h2 id="titulo" tabindex="-1">${TXT[pior][0]}</h2>
+    <p>${TXT[pior][1]}</p>
+  </section>
+  ${pior !== "ok" ? `<div class="mostrar"><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="7" y="2" width="16" height="26" rx="4" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M12 23h6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg><span>Mostre esta tela para a enfermagem.</span></div>` : ""}
+  <div class="resumo">
+    <h3>Suas respostas · ${ex.nome}<span>Checagem às ${st.hora}</span></h3>
+    ${linhas}
+  </div>
+  <div class="acoes"><button class="btn btn-principal" data-acao="reiniciar">Fazer nova checagem</button><button class="btn btn-sec" data-acao="revisar">Revisar respostas</button></div>
+  <p class="rodape">Checagem educativa do Setor de Imagem (SADT). Ela não substitui a avaliação da equipe. Nenhuma resposta é gravada.</p>`;
+}
+
+function render(foco){
+  app.innerHTML = st.tela === "inicio" ? telaInicio() : st.tela === "pergunta" ? telaPergunta() : telaResultado();
+  const alvo = foco && document.getElementById(foco);
+  if (alvo) alvo.focus({ preventScroll: foco === "retorno" ? false : true });
+  if (foco === "titulo") window.scrollTo({ top: 0 });
+}
+
+app.addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.exame){ st = { tela: "pergunta", exame: b.dataset.exame, i: 0, respostas: [], hora: "" }; return render("titulo"); }
+  if (b.dataset.op !== undefined){ st.respostas[st.i] = Number(b.dataset.op); return render("retorno"); }
+  const a = b.dataset.acao;
+  const n = st.exame ? EXAMES[st.exame].perguntas.length : 0;
+  if (a === "proxima"){
+    if (st.i < n - 1){ st.i++; return render("titulo"); }
+    st.hora = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    st.tela = "resultado"; return render("titulo");
+  }
+  if (a === "voltar"){ if (st.i === 0){ st.tela = "inicio"; return render(); } st.i--; return render("titulo"); }
+  if (a === "revisar"){ st.tela = "pergunta"; st.i = 0; return render("titulo"); }
+  if (a === "reiniciar"){ st = { tela: "inicio", exame: null, i: 0, respostas: [], hora: "" }; return render(); }
+});
+
+window.claude?.hot?.snapshot?.(() => st);
+const iniciar = (d) => { if (d && d.tela) st = d; render(); };
+window.claude?.hot?.ready ? window.claude.hot.ready(iniciar) : iniciar(window.claude?.hot?.data ?? {});
+</script>
